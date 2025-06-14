@@ -1,0 +1,24 @@
+﻿
+
+StatusCode        : 200
+StatusDescription : 
+Content           : [{"name":"ã¢ãã©ã³ãµã¹ãçç©","energy":343.0,"protein":12.7,"fat":6.0,"carbohydrates":64.9,"salt":0.0},{"name":"ãããç²¾ç½ç²","energy":346.0,"pr
+                    otein":11.2,"fat":4.4,"carbohydrates":69....
+RawContent        : HTTP/1.1 200 
+                    Transfer-Encoding: chunked
+                    Keep-Alive: timeout=60
+                    Connection: keep-alive
+                    Content-Type: application/json
+                    Date: Sat, 14 Jun 2025 14:48:01 GMT
+                    
+                    [{"name":"ã¢ãã©ã³ãµã¹ãçç©"...
+Forms             : {}
+Headers           : {[Transfer-Encoding, chunked], [Keep-Alive, timeout=60], [Connection, keep-alive], [Content-Type, application/json]...}
+Images            : {}
+InputFields       : {}
+Links             : {}
+ParsedHtml        : mshtml.HTMLDocumentClass
+RawContentLength  : 338053
+
+
+
