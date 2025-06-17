@@ -6,6 +6,7 @@ import org.example.nutritionapp.dto.FoodRequest;
 import org.example.nutritionapp.dto.FoodResponse;
 import org.example.nutritionapp.model.FoodItem;
 import org.example.nutritionapp.util.FoodCsvReader;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/foods")
+@CrossOrigin(origins = "*")
 public class FoodController {
 
   @GetMapping

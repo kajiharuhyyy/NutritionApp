@@ -1,23 +1,14 @@
 package org.example.nutritionapp.dto;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Setter
+@Getter
+@NoArgsConstructor
 public class FoodRequest {
     private String name;
     private double amount;
-
-    public String getName() {
-        return name;
-    }
-
-    public double getAmount() {
-        return amount;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setAmount(double amount) {
-      this.amount = amount;
-    }
 
 }

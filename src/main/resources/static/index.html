@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>食品成分計算</title>
+</head>
+<body>
+<h1>食品一覧</h1>
+<ul id="food-list"></ul>
+<input type="text" id="foodName" placeholder="食品名">
+<input type="number" id="amount" placeholder="量(g)">
+<button onclick="calculate()">計算する</button>
+<pre id="result"></pre>
+
+<script>
+  fetch('http://localhost:8080/api/foods')
+  .then(res => res.json())
+  .then(data => {
+    const list = document.getElementById('food-list');
+    data.forEach(item => {
+      const li = document.createElement('li');
+      li.textContent = `${item.name} - ${item.energy} kcal`;
+      list.appendChild(li);
+    });
+  })
+  .catch(err => console.error('取得エラー:', err));
+</script>
+<script>
+  function calculate() {
+    const name = document.getElementById("foodName").value;
+    const amount = parseFloat(document.getElementById("amount").value);
+
+
+    fetch("http://localhost:8080/api/foods/calculate",{
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: JSON.stringify({name, amount })
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error("計算に失敗しました");
+      }
+      return response.json();
+    })
+    .then(data => {
+      document.getElementById("result").innerText = `
+        食品名:　${data.name}
+        量: ${data.amount} g
+        エネルギー: ${data.energy} kcal
+        たんぱく質: ${data.protein} g
+        脂質: ${data.fat} g
+        炭水化物:　${data.carbohydrates} g
+        食塩相当量:　${data.salt} g
+    `;
+    })
+    .catch(error => {
+      document.getElementById("result").innerText = error;
+    });
+  }
+</script>
+</body>
+</html>
