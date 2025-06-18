@@ -6,19 +6,24 @@
 </head>
 <body>
 <h1>食品の栄養計算</h1>
-<label for="foodName">食品名:</label>
-<input list="foodList" id="foodName" name="foodName" placeholder="例: あわ　精白粒" />
+
+<div id="foodInputs">
+  <div class="food-group">
+    <input list="foodList" name="foodName" placeholder="食品名" />
+    <input type="number" name="amount" placeholder="g" />
+  </div>
+</div>
+
 <datalist id="foodList">
   <option value="読み込み中..."></option>
 </datalist>
 
-<label for="amount">摂取量(ｇ) :</label>
-<input type="number" id="amount" name="amount" placeholder="例： 150" />
-
+<button onclick="addFoodInput()">食品を追加</button>
 <button onclick="calculate()">計算する</button>
 
 <div id="result">ここに結果が表示されます</div>
 
-<script src="script.js"></script>
+<!-- defer付きでJSを読み込み -->
+<script src="script.js" defer></script>
 </body>
 </html>

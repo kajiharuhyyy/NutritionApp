@@ -1,6 +1,7 @@
 package org.example.nutritionapp.controller;
 
 import java.text.Normalizer;
+import java.util.ArrayList;
 import java.util.List;
 import org.example.nutritionapp.dto.FoodRequest;
 import org.example.nutritionapp.dto.FoodResponse;
@@ -73,5 +74,39 @@ public class FoodController {
 
     }
     throw new RuntimeException("Food Not Found" + request.getName());
+  }
+
+  @PostMapping("/calculate-multi")
+  public List<FoodResponse> calculateMultipleFoods(@RequestBody List<FoodRequest> requests) {
+    List<FoodItem> allFoods = FoodCsvReader.readFromCsv();
+    List<FoodResponse> results = new ArrayList<>();
+
+    for (FoodRequest request : requests) {
+      String normalizedRequestName = Normalizer.normalize(request.getName(), Normalizer.Form.NFKC)
+          .replaceAll("[<UNK>]", " ")
+          .trim();
+
+      for (FoodItem item : allFoods) {
+        String normalizedItemName = Normalizer.normalize(item.getName(), Normalizer.Form.NFKC)
+            .replaceAll("[<UNK>]", " ")
+            .trim();
+
+        if (normalizedItemName.equalsIgnoreCase(normalizedRequestName)) {
+          double factor = request.getAmount() / 100.0;
+
+          results.add(new FoodResponse(
+              item.getName(),
+              request.getAmount(),
+              item.getEnergy() * factor,
+              item.getProtein() * factor,
+              item.getFat() * factor,
+              item.getCarbohydrates() * factor,
+              item.getSalt() * factor
+          ));
+          break;
+        }
+      }
+    }
+    return results;
   }
 }

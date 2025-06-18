@@ -1,49 +1,71 @@
 function calculate(){
-    const name = document.getElementById("foodName").value;
-    const amount = parseFloat(document.getElementById("amount").value);
+    const foodGroups = document.querySelectorAll(".food-group");
+    const requestList = [];
 
-    fetch("http://localhost:8080/api/foods/calculate",{
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Accept": "application/json"
-      },
-      body: JSON.stringify({name, amount })
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error("計算に失敗しました");
+    foodGroups.forEach(group =>{
+      const name = group.querySelector('input[name="foodName"]').value;
+      const amount = parseFloat(group.querySelector('input[name="amount"]').value);
+      if (name && !isNaN(amount)) {
+        requestList.push({name, amount });
       }
-      return response.json();
-    })
-    .then(data => {
-      document.getElementById("result").innerText = `
-        食品名:　${data.name}
-        量: ${data.amount} g
-        エネルギー: ${data.energy} kcal
-        たんぱく質: ${data.protein} g
-        脂質: ${data.fat} g
-        炭水化物:　${data.carbohydrates} g
-        食塩相当量:　${data.salt} g
-    `;
-    })
-    .catch(error => {
-      document.getElementById("result").innerText = error;
     });
+
+  fetch("http://localhost:8080/api/foods/calculate-multi", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json"
+    },
+    body: JSON.stringify(requestList)
+  })
+  .then(response => response.json())
+  .then(data => {
+    const resultElement = document.getElementById("result");
+    resultElement.innerHTML = "";
+
+    data.forEach(item => {
+      const div = document.createElement("div")
+      div.innerHTML=`
+  食品名: ${item.name}<br>
+  量: ${item.amount} g<br>
+  エネルギー: ${item.energy} kcal<br>
+  たんぱく質: ${item.protein} g<br>
+  脂質: ${item.fat} g<br>
+  炭水化物: ${item.carbohydrates} g<br>
+  食塩相当量: ${item.salt} g<br>
+  <hr>
+      `;
+      resultElement.appendChild(div);
+    });
+  })
+  .catch(error => {
+    document.getElementById("result").innerText = error;
+  });
   }
-  window.onload = function (){
+
+window.onload = function () {
   fetch("http://localhost:8080/api/foods")
-    .then(response =>response.json())
-    .then(data => {
-      const dataList = document.getElementById("foodList");
-      dataList.innerHTML = "";
-      data.forEach(item => {
-        const option = document.createElement("option");
-        option.value = item.name;
-        dataList.appendChild(option);
-      });
-    })
-    .catch(error => {
-      console.error("食品一覧取得失敗:", error);
+  .then(response => response.json())
+  .then(data => {
+    const dataList = document.getElementById("foodList");
+    dataList.innerHTML = "";
+    data.forEach(item => {
+      const option = document.createElement("option");
+      option.value = item.name;
+      dataList.appendChild(option);
     });
+  })
+  .catch(error => {
+    console.error("食品一覧取得失敗:", error);
+  });
 };
+
+function addFoodInput() {
+  const div = document.createElement("div");
+  div.classList.add("food-group");
+  div.innerHTML = `
+    <input list="foodList" name="foodName" placeholder="食品名" />
+    <input type="number" name="amount" placeholder="g" />
+  `;
+  document.getElementById("foodInputs").appendChild(div);
+}
