@@ -35,14 +35,14 @@ function calculate(){
     data.forEach(item => {
       const div = document.createElement("div")
       div.innerHTML=`
-  食品名: ${item.name}<br>
-  量: ${item.amount.toFixed(2)} g<br>
-  エネルギー: ${item.energy.toFixed(2)} kcal<br>
-  たんぱく質: ${item.protein.toFixed(2)} g<br>
-  脂質: ${item.fat.toFixed(2)} g<br>
-  炭水化物: ${item.carbohydrates.toFixed(2)} g<br>
-  食塩相当量: ${item.salt.toFixed(2)} g<br>
-  <hr>
+      食品名: ${item.name}<br>
+      量: ${item.amount.toFixed(2)} g<br>
+      エネルギー: ${item.energy.toFixed(2)} kcal<br>
+      たんぱく質: ${item.protein.toFixed(2)} g<br>
+      脂質: ${item.fat.toFixed(2)} g<br>
+      炭水化物: ${item.carbohydrates.toFixed(2)} g<br>
+      食塩相当量: ${item.salt.toFixed(2)} g<br>
+      <hr>
       `;
       resultElement.appendChild(div);
 
@@ -65,6 +65,19 @@ function calculate(){
     総食塩相当量: ${total.salt.toFixed(2)} g<br>
     `;
     resultElement.appendChild(totalDiv);
+
+    fetch("http://localhost:8080/api/foods/save-result", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data)
+    })
+    .then(res => res.text())
+    .then(message => {
+      console.log("保存メッセージ:", message);
+    })
+    .catch(err => console.error("保存エラー:", err));
   })
   .catch(error => {
     document.getElementById("result").innerText = error;
@@ -86,7 +99,28 @@ window.onload = function () {
   .catch(error => {
     console.error("食品一覧取得失敗:", error);
   });
+
+  fetch("http://localhost:8080/api/foods/history")
+  .then(response => response.json())
+  .then(history => {
+    const historyElement = document.getElementById("history");
+    historyElement.innerHTML = "<h2>履歴</h2>";
+    history.forEach(item => {
+      const div = document.createElement("div");
+      div.innerHTML = `
+          食品名: ${item.name}<br>
+          量: ${item.amount} g<br>
+          エネルギー: ${item.energy.toFixed(2)} kcal<br>
+          <hr>
+        `;
+      historyElement.appendChild(div);
+    });
+  })
+  .catch(error => {
+    console.error("履歴取得失敗:", error);
+  });
 };
+
 
 function addFoodInput() {
   const div = document.createElement("div");

@@ -1,5 +1,12 @@
 package org.example.nutritionapp.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
@@ -7,6 +14,8 @@ import org.example.nutritionapp.dto.FoodRequest;
 import org.example.nutritionapp.dto.FoodResponse;
 import org.example.nutritionapp.model.FoodItem;
 import org.example.nutritionapp.util.FoodCsvReader;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,23 +40,11 @@ public class FoodController {
 
     for (FoodItem item : allFoods) {
       System.out.println("CSV読み込み食品名: " + item.getName());
-//      if (item.getName().replace("　"," ").contains(request.getName().replace("　"," "))) {
-//        double factor = request.getAmount() / 100.0;
-//        return new FoodResponse(
-//            item.getName(),
-//            request.getAmount(),
-//            item.getEnergy() * factor,
-//            item.getProtein() * factor,
-//            item.getFat() * factor,
-//            item.getCarbohydrates() * factor,
-//            item.getSalt() * factor
-//        );
-//      }
       String normalizedItemName = Normalizer.normalize(item.getName(), Normalizer.Form.NFKC)
-          .replaceAll("[　]", " ")
+          .replaceAll("　", " ")
           .trim();
       String normalizedRequestName = Normalizer.normalize(request.getName(), Normalizer.Form.NFKC)
-          .replaceAll("[　]", " ")
+          .replaceAll("　", " ")
           .trim();
 
       if (normalizedItemName.equalsIgnoreCase(normalizedRequestName)) {
@@ -108,5 +105,37 @@ public class FoodController {
       }
     }
     return results;
+  }
+
+  @PostMapping("/save-result")
+  public ResponseEntity<String> saveResult(@RequestBody List<FoodResponse> results) {
+    try {
+      ObjectMapper mapper = new ObjectMapper();
+      Path path = Paths.get("saved_results.json");
+      List<FoodResponse> allResults = new ArrayList<>();
+
+      if (Files.exists(path)) {
+        String existingJson = Files.readString(path);
+        allResults = mapper.readValue(existingJson, new TypeReference<>() {});
+      }
+
+      allResults.addAll(results);
+      Files.write(path, mapper.writeValueAsBytes(allResults));
+
+      return ResponseEntity.ok("保存成功");
+    } catch (IOException e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("保存失敗");
+    }
+  }
+
+  @GetMapping("/history")
+  public List<FoodResponse> getHistory() throws IOException {
+    File file = new File("saved_results.json");
+    if (!file.exists()) return List.of();
+
+    String json = Files.readString(file.toPath());
+    ObjectMapper mapper = new ObjectMapper();
+    return mapper.readValue(json, new TypeReference<>() {
+    });
   }
 }
