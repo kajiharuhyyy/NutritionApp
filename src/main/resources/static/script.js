@@ -36,12 +36,12 @@ function calculate(){
       const div = document.createElement("div")
       div.innerHTML=`
   食品名: ${item.name}<br>
-  量: ${item.amount} g<br>
-  エネルギー: ${item.energy} kcal<br>
-  たんぱく質: ${item.protein} g<br>
-  脂質: ${item.fat} g<br>
-  炭水化物: ${item.carbohydrates} g<br>
-  食塩相当量: ${item.salt} g<br>
+  量: ${item.amount.toFixed(2)} g<br>
+  エネルギー: ${item.energy.toFixed(2)} kcal<br>
+  たんぱく質: ${item.protein.toFixed(2)} g<br>
+  脂質: ${item.fat.toFixed(2)} g<br>
+  炭水化物: ${item.carbohydrates.toFixed(2)} g<br>
+  食塩相当量: ${item.salt.toFixed(2)} g<br>
   <hr>
       `;
       resultElement.appendChild(div);
