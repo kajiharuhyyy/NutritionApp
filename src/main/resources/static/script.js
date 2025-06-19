@@ -23,6 +23,15 @@ function calculate(){
     const resultElement = document.getElementById("result");
     resultElement.innerHTML = "";
 
+    let total = {
+      amount: 0,
+      energy: 0,
+      protein: 0,
+      fat: 0,
+      carbohydrates: 0,
+      salt: 0
+    };
+
     data.forEach(item => {
       const div = document.createElement("div")
       div.innerHTML=`
@@ -36,7 +45,26 @@ function calculate(){
   <hr>
       `;
       resultElement.appendChild(div);
+
+      total.amount += item.amount;
+      total.energy += item.energy;
+      total.protein += item.protein;
+      total.fat += item.fat;
+      total.carbohydrates += item.carbohydrates;
+      total.salt += item.salt;
     });
+
+    const totalDiv = document.createElement("div");
+    totalDiv.innerHTML =`
+    <strong> 【合計】</strong><br>
+    総量: ${total.amount} g<br>
+    総エネルギー: ${total.energy.toFixed(2)} kcal<br>
+    総たんぱく質: ${total.protein.toFixed(2)} g<br>
+    総脂質: ${total.fat.toFixed(2)} g<br>
+    総炭水化物: ${total.carbohydrates.toFixed(2)} g<br>
+    総食塩相当量: ${total.salt.toFixed(2)} g<br>
+    `;
+    resultElement.appendChild(totalDiv);
   })
   .catch(error => {
     document.getElementById("result").innerText = error;
