@@ -34,12 +34,38 @@ function calculateEnergyNeed() {
   }
 
   const energyNeed = bmr * activity;
+  const saltTarget = getSaltTarget(gender);
+
+  const targets = {
+    protein: {
+      min: (energyNeed * 0.13 / 4).toFixed(1),
+      max: (energyNeed * 0.20 / 4).toFixed(1)
+    },
+    fat: {
+      min: (energyNeed * 0.20 / 9).toFixed(1),
+      max: (energyNeed * 0.30 / 9).toFixed(1)
+    },
+    carbohydrates: {
+      min: (energyNeed * 0.50 / 4).toFixed(1),
+      max: (energyNeed * 0.65 / 4).toFixed(1)
+    }
+  };
+
 
   document.getElementById("energyNeedResult").innerText =
       `基礎代謝量: ${bmr.toFixed(0)} kcal/日\n` +
-      `推定必要エネルギー量: ${energyNeed.toFixed(0)} kcal/日`;
+      `推定必要エネルギー量: ${energyNeed.toFixed(0)} kcal/日\n` +
+      `たんぱく質: ${targets.protein.min}g ~ ${targets.protein.max}g\n`+
+      `脂質: ${targets.fat.min}g ~ ${targets.fat.max}g\n` +
+      `炭水化物: ${targets.carbohydrates.min}g ~ ${targets.carbohydrates.max}g\n` +
+      `塩分目標: ${saltTarget}g未満`;
 }
 
+function getSaltTarget(gender) {
+  if (gender === "male") return 7.5;
+  if (gender === "female") return 6.5;
+  return 7.0;
+}
 
 function calculate(){
     const foodGroups = document.querySelectorAll(".food-group");
