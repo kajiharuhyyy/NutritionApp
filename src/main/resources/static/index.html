@@ -5,12 +5,41 @@
   <title>食品成分計算</title>
 </head>
 <body>
-<h1>食品の栄養計算</h1>
+<h2>標準体重の計算</h2>
+<label for="heightInput"></label><input type="number" id="heightInput" name="heightInput" placeholder="例:1.60" step="0.01"/>
+<button onclick="calculateStandardWeight()">標準体重を計算</button>
+<div id="weightResult"></div>
+
+<h2>エネルギー必要量の計算</h2>
+<p>年齢、性別、体重、身体活動レベルを入力してください</p>
+
+<label>年齢：</label><label for="age"></label><input type="number" id="age" placeholder="30"><br>
+<label>性別：</label>
+<label for="gender"></label><select id="gender">
+  <option value="male">男性</option>
+  <option value="female">女性</option>
+</select><br>
+<label>体重(kg)：</label><label for="weight"></label><input type="number" id="weight" placeholder="53"><br>
+<label>身体活動レベル：</label>
+<label for="activityLevel"></label><select id="activityLevel">
+  <option value="1.50">低い（座位中心）</option>
+  <option value="1.75">ふつう（軽い運動）</option>
+  <option value="2.00">高い（活発）</option>
+</select><br>
+
+<button onclick="calculateEnergyNeed()">必要エネルギーを計算</button>
+<div id="energyNeedResult"></div>
+
+<h2>食品の栄養計算</h2>
 
 <div id="foodInputs">
   <div class="food-group">
-    <input list="foodList" name="foodName" placeholder="食品名" />
-    <input type="number" name="amount" placeholder="g" />
+    <label>
+      <input list="foodList" name="foodName" placeholder="食品名" />
+    </label>
+    <label>
+      <input type="number" name="amount" placeholder="g" />
+    </label>
   </div>
 </div>
 

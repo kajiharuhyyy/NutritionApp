@@ -1,3 +1,46 @@
+function calculateStandardWeight() {
+  const height = parseFloat(document.getElementById("heightInput").value);
+  if (isNaN(height) || height <= 0) {
+    document.getElementById("weightResult").innerText = "正しい身長を入力してください";
+    return;
+  }
+
+  const standardWeight = height * height * 22;
+  document.getElementById("weightResult").innerText = `標準体重は${standardWeight.toFixed(2)}kgです`;
+}
+
+function calculateEnergyNeed() {
+  const age = parseInt(document.getElementById("age").value);
+  const gender = document.getElementById("gender").value;
+  const weight = parseFloat(document.getElementById("weight").value);
+  const activity = parseFloat(document.getElementById("activityLevel").value);
+
+  if (isNaN(age) || isNaN(weight)) {
+    document.getElementById("energyNeedResult").innerText = "年齢と体重を正しく入力してください";
+    return;
+  }
+
+  let bmr;
+
+  // 簡易的な日本人向け基礎代謝量（厚労省推奨値ベース）
+  if (gender === "male") {
+    if (age < 30) bmr = 15.3 * weight + 679;
+    else if (age < 60) bmr = 11.6 * weight + 879;
+    else bmr = 13.5 * weight + 487;
+  } else {
+    if (age < 30) bmr = 14.7 * weight + 496;
+    else if (age < 60) bmr = 8.7 * weight + 829;
+    else bmr = 10.5 * weight + 596;
+  }
+
+  const energyNeed = bmr * activity;
+
+  document.getElementById("energyNeedResult").innerText =
+      `基礎代謝量: ${bmr.toFixed(0)} kcal/日\n` +
+      `推定必要エネルギー量: ${energyNeed.toFixed(0)} kcal/日`;
+}
+
+
 function calculate(){
     const foodGroups = document.querySelectorAll(".food-group");
     const requestList = [];
@@ -83,6 +126,7 @@ function calculate(){
     document.getElementById("result").innerText = error;
   });
   }
+
 
 window.onload = function () {
   fetch("http://localhost:8080/api/foods")

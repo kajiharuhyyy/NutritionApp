@@ -13,4 +13,8 @@ public class FoodResponse {
   private double fat;
   private double carbohydrates;
   private double salt;
+
+  @SuppressWarnings("unused")
+  public FoodResponse() {
   }
+}
