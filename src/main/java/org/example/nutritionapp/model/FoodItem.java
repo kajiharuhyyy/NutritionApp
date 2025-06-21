@@ -1,13 +1,19 @@
 package org.example.nutritionapp.model;
 
-public class FoodItem {
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
+public class FoodItem {
   private String name;
   private double energy;
   private double protein;
   private double fat;
   private double carbohydrates;
   private double salt;
+
+  public FoodItem() {}
 
   public FoodItem(String name, double energy, double protein, double fat, double carbohydrates, double salt) {
     this.name = name;
@@ -17,29 +23,4 @@ public class FoodItem {
     this.carbohydrates = carbohydrates;
     this.salt = salt;
   }
-
-  public  String getName() {
-    return name;
-  }
-
-  public double getEnergy() {
-    return energy;
-  }
-
-  public double getProtein() {
-    return protein;
-  }
-
-  public double getFat() {
-    return fat;
-  }
-
-  public double getCarbohydrates() {
-    return carbohydrates;
-  }
-
-  public double getSalt() {
-    return salt;
-  }
-
 }
