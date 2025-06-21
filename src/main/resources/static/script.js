@@ -70,6 +70,9 @@ function getSaltTarget(gender) {
 function calculate(){
     const foodGroups = document.querySelectorAll(".food-group");
     const requestList = [];
+    const gender = document.getElementById("gender").value;
+    const saltTarget = getSaltTarget(gender);
+    let saltFeedback = "";
 
     foodGroups.forEach(group =>{
       const name = group.querySelector('input[name="foodName"]').value;
@@ -123,6 +126,12 @@ function calculate(){
       total.salt += item.salt;
     });
 
+    if (total.salt <= saltTarget) {
+      saltFeedback = `<span style="color:green;"> 塩分摂取量は目標以内です。</span>`;
+    } else {
+      saltFeedback = `<span style="color:red;"> 塩分摂取量は目標を超えています。</span>`;
+    }
+
     const totalDiv = document.createElement("div");
     totalDiv.innerHTML =`
     <strong> 【合計】</strong><br>
@@ -134,6 +143,7 @@ function calculate(){
     総食塩相当量: ${total.salt.toFixed(2)} g<br>
     `;
     resultElement.appendChild(totalDiv);
+    totalDiv.innerHTML += `<br>${saltFeedback}`
 
     fetch("http://localhost:8080/api/foods/save-result", {
       method: "POST",
