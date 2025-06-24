@@ -32,13 +32,14 @@ public class FoodCsvReader {
         if (cols.length < 6) continue;
 
         String name = cols[0];
+        double amount = Double.parseDouble(cols[1]);
         double energy = parseSafe(cols[1]);
         double protein = parseSafe(cols[2]);
         double fat = parseSafe(cols[3]);
         double carbohydrates = parseSafe(cols[4]);
         double salt = parseSafe(cols[5]);
 
-        foodList.add(new FoodItem(name, energy, protein, fat,  carbohydrates, salt));
+        foodList.add(new FoodItem(name, amount, energy, protein, fat,  carbohydrates, salt));
       }
 
       reader.close();
