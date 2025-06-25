@@ -1,8 +1,8 @@
 package org.example.nutritionapp.controller;
 
 import java.text.Normalizer;
+import org.example.nutritionapp.dto.PfcRatioResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -41,26 +41,27 @@ public class FoodController {
 //    List<FoodResponse> matched = new ArrayList<>();
 //    for (FoodItem item : allFoods) {
 //      if (normalize(item.getName()).equalsIgnoreCase(normalizedRequestName)) {
-      List <FoodResponse> matched = allFoods.stream()
-          .filter(item -> normalize(item.getName()).contains(normalizedRequestName))
-          .map(item -> {
-            double factor = request.getAmount() / 100.0;
-            return new  FoodResponse(
-            item.getName(),
-            request.getAmount(),
-            item.getEnergy() * factor,
-            item.getProtein() * factor,
-            item.getFat() * factor,
-            item.getCarbohydrates() * factor,
-            item.getSalt() * factor
-        );
-      }).collect(Collectors.toList());
+    List <FoodResponse> matched = allFoods.stream()
+        .filter(item -> normalize(item.getName()).contains(normalizedRequestName))
+        .map(item -> {
+          double factor = request.getAmount() / 100.0;
+          return new  FoodResponse(
+              item.getName(),
+              request.getAmount(),
+              item.getEnergy() * factor,
+              item.getProtein() * factor,
+              item.getFat() * factor,
+              item.getCarbohydrates() * factor,
+              item.getSalt() * factor
+          );
+        }).collect(Collectors.toList());
     if (matched.isEmpty()) {
       throw new RuntimeException("Food Not Found: " + request.getName());
     }
 
     return matched;
   }
+
 
   @PostMapping("/calculate-multi")
   public List<FoodResponse> calculateMultipleFoods(@RequestBody List<FoodRequest> requests) {
@@ -116,6 +117,34 @@ public class FoodController {
     return Normalizer.normalize(input, Normalizer.Form.NFKC)
         .replaceAll("　", " ")
         .trim();
+  }
+
+  @PostMapping("/pfc-ratio")
+  public PfcRatioResponse calculatePfcRatio(@RequestBody List<FoodResponse> foods) {
+    double totalProtein = 0;
+    double totalFat = 0;
+    double totalCarb = 0;
+
+    for (FoodResponse food : foods) {
+      totalProtein += food.getProtein();
+      totalFat += food.getFat();
+      totalCarb += food.getCarbohydrates();
+    }
+
+    double proteinKcal = totalProtein * 4;
+    double fatKcal = totalFat * 9;
+    double carbKcal = totalCarb * 4;
+    double totalKcal = proteinKcal + fatKcal + carbKcal;
+
+    if (totalKcal == 0) {
+      return new PfcRatioResponse(0,0,0);
+    }
+
+    double pRatio = proteinKcal / totalKcal * 100;
+    double fRatio = fatKcal / totalKcal * 100;
+    double cRatio = carbKcal / totalKcal * 100;
+
+    return new PfcRatioResponse(pRatio,fRatio,cRatio);
   }
 }
 
