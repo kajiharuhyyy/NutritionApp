@@ -1,9 +1,8 @@
 package org.example.nutritionapp.controller;
 
-import static org.example.nutritionapp.util.FoodCsvReader.readFromCsv;
-
 import java.text.Normalizer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -34,16 +33,17 @@ public class FoodController {
   }
 
   @PostMapping("/calculate")
-  public FoodResponse calculateFoods(@RequestBody FoodRequest request) {
+  public List<FoodResponse> calculateFoods(@RequestBody FoodRequest request) {
     List<FoodItem> allFoods = foodItemRepository.findAll(); // CSVではなくDBから取得
 
     String normalizedRequestName = normalize(request.getName());
 
+    List<FoodResponse> matched = new ArrayList<>();
     for (FoodItem item : allFoods) {
       if (normalize(item.getName()).equalsIgnoreCase(normalizedRequestName)) {
         double factor = request.getAmount() / 100.0;
 
-        return new FoodResponse(
+        matched.add(new  FoodResponse(
             item.getName(),
             request.getAmount(),
             item.getEnergy() * factor,
@@ -51,10 +51,14 @@ public class FoodController {
             item.getFat() * factor,
             item.getCarbohydrates() * factor,
             item.getSalt() * factor
-        );
+        ));
       }
     }
-    throw new RuntimeException("Food Not Found: " + request.getName());
+    if (matched.isEmpty()) {
+      throw new RuntimeException("Food Not Found: " + request.getName());
+    }
+
+    return matched;
   }
 
   @PostMapping("/calculate-multi")
@@ -113,3 +117,4 @@ public class FoodController {
         .trim();
   }
 }
+

@@ -47,20 +47,8 @@ public class FoodCsvReader {
     } catch (Exception e) {
       throw new RuntimeException("CSV読み込みに失敗しました", e);
     }
-
     return foodList;
   }
-
-//  private static double parseSafe(String value) {
-//    try {
-//      if (value == null || value.isBlank() || value.equalsIgnoreCase("Tr")) {
-//        return 0.0;
-//      }
-//      return Double.parseDouble(value);
-//    } catch (Exception e) {
-//      return 0.0;
-//    }
-//  }
 
   private static double parseSafe(String str) {
     if (str == null || str.trim().isEmpty() || str.equalsIgnoreCase("Tr")) return 0.0;
@@ -85,6 +73,4 @@ public class FoodCsvReader {
     }
     return sb.toString();
   }
-
-
 }
