@@ -38,12 +38,14 @@ public class FoodController {
 
     String normalizedRequestName = normalize(request.getName());
 
-    List<FoodResponse> matched = new ArrayList<>();
-    for (FoodItem item : allFoods) {
-      if (normalize(item.getName()).equalsIgnoreCase(normalizedRequestName)) {
-        double factor = request.getAmount() / 100.0;
-
-        matched.add(new  FoodResponse(
+//    List<FoodResponse> matched = new ArrayList<>();
+//    for (FoodItem item : allFoods) {
+//      if (normalize(item.getName()).equalsIgnoreCase(normalizedRequestName)) {
+      List <FoodResponse> matched = allFoods.stream()
+          .filter(item -> normalize(item.getName()).contains(normalizedRequestName))
+          .map(item -> {
+            double factor = request.getAmount() / 100.0;
+            return new  FoodResponse(
             item.getName(),
             request.getAmount(),
             item.getEnergy() * factor,
@@ -51,9 +53,8 @@ public class FoodController {
             item.getFat() * factor,
             item.getCarbohydrates() * factor,
             item.getSalt() * factor
-        ));
-      }
-    }
+        );
+      }).collect(Collectors.toList());
     if (matched.isEmpty()) {
       throw new RuntimeException("Food Not Found: " + request.getName());
     }
