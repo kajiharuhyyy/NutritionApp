@@ -145,6 +145,19 @@ function calculate(){
     resultElement.appendChild(totalDiv);
     totalDiv.innerHTML += `<br>${saltFeedback}`
 
+    fetch("http://localhost:8080/api/foods/pfc-ratio", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data)
+    })
+    .then(res => res.json())
+    .then(pfc => {
+      updatePfcChart(pfc);
+    })
+    .catch(error => console.error("pfc計算エラー:", error));
+
     fetch("http://localhost:8080/api/foods/save-result", {
       method: "POST",
       headers: {
@@ -211,3 +224,22 @@ function addFoodInput() {
   `;
   document.getElementById("foodInputs").appendChild(div);
 }
+
+function updatePfcChart(pfc) {
+  const chart = document.getElementById('pfcChart');
+  const label = document.getElementById('pfcLabel');
+
+  chart.style.background = `conic-gradient(
+    #f66 0% ${pfc.proteinRatio}%,
+    #6f6 ${pfc.carbohydrateRatio}% ${pfc.proteinRatio + pfc.fatRatio}%,
+    #66f ${pfc.proteinRatio + pfc.fatRatio}% 100%
+  )`;
+
+  label.innerHTML = `
+    <strong>PFCバランス</strong><br>
+    タンパク質: ${pfc.proteinRatio.toFixed(1)}%<br>
+    脂質: ${pfc.fatRatio.toFixed(1)}%<br>
+    炭水化物: ${pfc.carbohydrateRatio.toFixed(1)}%
+  `;
+}
+
