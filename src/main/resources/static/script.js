@@ -242,4 +242,3 @@ function updatePfcChart(pfc) {
     炭水化物: ${pfc.carbohydrateRatio.toFixed(1)}%
   `;
 }
-
