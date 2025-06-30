@@ -1,3 +1,5 @@
+let globalPfcTargets = null;
+
 function calculateStandardWeight() {
   const height = parseFloat(document.getElementById("heightInput").value);
   if (isNaN(height) || height <= 0) {
@@ -59,6 +61,8 @@ function calculateEnergyNeed() {
       `脂質: ${targets.fat.min}g ~ ${targets.fat.max}g\n` +
       `炭水化物: ${targets.carbohydrates.min}g ~ ${targets.carbohydrates.max}g\n` +
       `塩分目標: ${saltTarget}g未満`;
+
+  globalPfcTargets = targets;
 }
 
 function getSaltTarget(gender) {
@@ -68,6 +72,11 @@ function getSaltTarget(gender) {
 }
 
 function calculate(){
+  if(!globalPfcTargets) {
+    alert("先に必要エネルギー量を計算してください。");
+    return;
+  }
+
     const foodGroups = document.querySelectorAll(".food-group");
     const requestList = [];
     const gender = document.getElementById("gender").value;
@@ -131,6 +140,17 @@ function calculate(){
     } else {
       saltFeedback = `<span style="color:red;"> 塩分摂取量は目標を超えています。</span>`;
     }
+
+  if(globalPfcTargets) {
+    const comparisonDiv =document.createElement("div");
+    comparisonDiv.innerHTML = `
+      <strong>【目標との比較】</strong><br>
+      たんぱく質:${total.protein.toFixed(1)} g (目標:${globalPfcTargets.protein.min}g ~ ${globalPfcTargets.protein.max}g) <br>
+      脂質:${total.fat.toFixed(1)} g (目標:${globalPfcTargets.fat.min}g ~ ${globalPfcTargets.fat.max}g) <br>
+      炭水化物:${total.carbohydrates.toFixed(1)} g (目標:${globalPfcTargets.carbohydrates.min}g ~ ${globalPfcTargets.carbohydrates.max}g) <br>
+    `;
+    resultElement.appendChild(comparisonDiv);
+  }
 
     const totalDiv = document.createElement("div");
     totalDiv.innerHTML =`
