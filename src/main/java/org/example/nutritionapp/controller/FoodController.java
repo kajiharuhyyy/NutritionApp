@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
+import org.example.nutritionapp.dto.DailyTotalDTO;
 import org.example.nutritionapp.dto.FoodRequest;
 import org.example.nutritionapp.dto.FoodResponse;
 import org.example.nutritionapp.model.FoodItem;
@@ -145,6 +146,11 @@ public class FoodController {
     double cRatio = carbKcal / totalKcal * 100;
 
     return new PfcRatioResponse(pRatio,fRatio,cRatio);
+  }
+
+  @GetMapping("/history/daily-summary")
+  public List<DailyTotalDTO> getDailySummary() {
+    return foodHistoryRepository.findDailyTotals();
   }
 }
 
