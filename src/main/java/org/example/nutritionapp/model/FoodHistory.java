@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -27,6 +28,8 @@ public class FoodHistory {
 
   private LocalDateTime createdAt = LocalDateTime.now();
 
+  private LocalDate date = LocalDate.now();
+
   // デフォルトコンストラクタ（JPA用）
   public FoodHistory() {}
 
@@ -40,5 +43,6 @@ public class FoodHistory {
     this.carbohydrates = carbohydrates;
     this.salt = salt;
     this.createdAt = LocalDateTime.now();
+    this.date = LocalDate.now();
   }
 }

@@ -232,6 +232,8 @@ window.onload = function () {
   .catch(error => {
     console.error("履歴取得失敗:", error);
   });
+
+  fetchDailyPfcSummary();
 };
 
 
@@ -261,4 +263,54 @@ function updatePfcChart(pfc) {
     脂質: ${pfc.fatRatio.toFixed(1)}%<br>
     炭水化物: ${pfc.carbohydrateRatio.toFixed(1)}%
   `;
+}
+
+function fetchDailyPfcSummary() {
+  fetch("http://localhost:8080/api/foods/history/daily-summary")
+  .then(response => response.json())
+  .then(data => {
+    const labels = data.map(item => item.date);
+    const proteinData = data.map(item => item.protein * 4);
+    const fatData = data.map(item => item.fat * 9);
+    const carbData = data.map(item => item.carbohydrates * 4);
+
+    const ctx = document.getElementById('dailyPfcChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels : labels,
+        datasets : [
+          {
+            label : 'たんぱく質(kcal)',
+            data : proteinData,
+            stack : 'stack1'
+          },
+          {
+            label : '脂質(kcal)',
+            data : fatData,
+            stack : 'stack1'
+          },
+          {
+            label : '炭水化物(kcal)',
+            data : carbData,
+            stack : 'stack1'
+          }
+        ]
+      },
+      options : {
+        responsive: true,
+        plugins: {
+          title: {
+            display: true,
+            text: '日別PFCバランス(kcal)'
+          }
+        },
+        scales: {
+          x: { stacked: true},
+          y: { stacked: true, title: { display: true, text: 'kcal' } }
+        }
+      }
+    });
+  })
+  .catch(err => console.error("日別PFCエラー:", err));
 }
