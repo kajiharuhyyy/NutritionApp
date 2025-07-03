@@ -91,7 +91,7 @@ function calculate(){
       }
     });
 
-  fetch("http://localhost:8080/api/foods/calculate-multi", {
+  fetch("/api/foods/calculate-multi", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -165,7 +165,7 @@ function calculate(){
     resultElement.appendChild(totalDiv);
     totalDiv.innerHTML += `<br>${saltFeedback}`
 
-    fetch("http://localhost:8080/api/foods/pfc-ratio", {
+    fetch("/api/foods/pfc-ratio", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -178,7 +178,7 @@ function calculate(){
     })
     .catch(error => console.error("pfc計算エラー:", error));
 
-    fetch("http://localhost:8080/api/foods/save-result", {
+    fetch("/api/foods/save-result", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -198,7 +198,7 @@ function calculate(){
 
 
 window.onload = function () {
-  fetch("http://localhost:8080/api/foods")
+  fetch("/api/foods")
   .then(response => response.json())
   .then(data => {
     const dataList = document.getElementById("foodList");
@@ -213,7 +213,7 @@ window.onload = function () {
     console.error("食品一覧取得失敗:", error);
   });
 
-  fetch("http://localhost:8080/api/foods/history")
+  fetch("/api/foods/history")
   .then(response => response.json())
   .then(history => {
     const historyElement = document.getElementById("history");
@@ -266,7 +266,7 @@ function updatePfcChart(pfc) {
 }
 
 function fetchDailyPfcSummary() {
-  fetch("http://localhost:8080/api/foods/history/daily-summary")
+  fetch("/api/foods/history/daily-summary")
   .then(response => response.json())
   .then(data => {
     const labels = data.map(item => item.date);
