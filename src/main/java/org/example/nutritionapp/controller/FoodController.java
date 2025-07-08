@@ -5,6 +5,9 @@ import org.example.nutritionapp.dto.PfcRatioResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import jakarta.validation.Valid;
+
 import java.util.List;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
@@ -34,14 +37,11 @@ public class FoodController {
   }
 
   @PostMapping("/calculate")
-  public List<FoodResponse> calculateFoods(@RequestBody FoodRequest request) {
+  public List<FoodResponse> calculateFoods(@RequestBody @Valid FoodRequest request) {
     List<FoodItem> allFoods = foodItemRepository.findAll(); // CSVではなくDBから取得
 
     String normalizedRequestName = normalize(request.getName());
 
-//    List<FoodResponse> matched = new ArrayList<>();
-//    for (FoodItem item : allFoods) {
-//      if (normalize(item.getName()).equalsIgnoreCase(normalizedRequestName)) {
     List <FoodResponse> matched = allFoods.stream()
         .filter(item -> normalize(item.getName()).contains(normalizedRequestName))
         .map(item -> {
@@ -65,7 +65,7 @@ public class FoodController {
 
 
   @PostMapping("/calculate-multi")
-  public List<FoodResponse> calculateMultipleFoods(@RequestBody List<FoodRequest> requests) {
+  public List<FoodResponse> calculateMultipleFoods(@RequestBody @Valid List<@Valid FoodRequest> requests) {
     List<FoodItem> allFoods = foodItemRepository.findAll();
     List<FoodResponse> results = new ArrayList<>();
 
@@ -108,7 +108,7 @@ public class FoodController {
   }
 
   @PostMapping("/save-result")
-  public ResponseEntity<?> saveResult(@RequestBody List<FoodResponse> results) {
+  public ResponseEntity<?> saveResult(@RequestBody @Valid List<FoodResponse> results) {
     List<FoodHistory> toSave = results.stream().map(FoodResponse::toHistoryEntity).toList();
     foodHistoryRepository.saveAll(toSave);
     return ResponseEntity.ok("保存成功");
@@ -121,7 +121,7 @@ public class FoodController {
   }
 
   @PostMapping("/pfc-ratio")
-  public PfcRatioResponse calculatePfcRatio(@RequestBody List<FoodResponse> foods) {
+  public PfcRatioResponse calculatePfcRatio(@RequestBody @Valid List<FoodResponse> foods) {
     double totalProtein = 0;
     double totalFat = 0;
     double totalCarb = 0;
