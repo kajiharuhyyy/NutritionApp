@@ -9,11 +9,11 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 public class FoodRequest {
-    @NotBlank(message = "食品名は必須です")
+    @NotBlank(message = "{food.name.required}")
     private String name;
 
-    @NotNull(message = "量は必須です")
-    @Positive(message = "量は0より大きい必要があります")
+    @NotNull(message = "{food.amount.required}")
+    @Positive(message = "{food.amount.positive}")
     private double amount;
 
 }
