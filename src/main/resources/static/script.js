@@ -100,7 +100,12 @@ function calculate(){
     body: JSON.stringify(requestList)
   })
   .then(response => response.json())
-  .then(data => {
+  .then(res => {
+    if (!res.success) {
+      alert("計算エラー: " + res.message);
+      return;
+    }
+    const data = res.data;
     const resultElement = document.getElementById("result");
     resultElement.innerHTML = "";
 
