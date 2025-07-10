@@ -2,6 +2,7 @@ package org.example.nutritionapp.controller;
 
 import java.text.Normalizer;
 import org.example.nutritionapp.dto.PfcRatioResponse;
+import org.example.nutritionapp.exception.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,12 +33,13 @@ public class FoodController {
   private FoodHistoryRepository foodHistoryRepository;
 
   @GetMapping
-  public List<FoodItem> getAllFoods() {
-    return foodItemRepository.findAll();
+  public ResponseEntity<ApiResponse<List<FoodItem>>> getAllFoods() {
+    List<FoodItem> foods = foodItemRepository.findAll();
+    return ResponseEntity.ok(new ApiResponse<>(true, "食品一覧取得成功", foods));
   }
 
   @PostMapping("/calculate")
-  public List<FoodResponse> calculateFoods(@RequestBody @Valid FoodRequest request) {
+  public ResponseEntity<ApiResponse<List<FoodResponse>>> calculateFoods(@RequestBody @Valid FoodRequest request) {
     List<FoodItem> allFoods = foodItemRepository.findAll(); // CSVではなくDBから取得
 
     String normalizedRequestName = normalize(request.getName());
@@ -57,15 +59,15 @@ public class FoodController {
           );
         }).collect(Collectors.toList());
     if (matched.isEmpty()) {
-      throw new RuntimeException("Food Not Found: " + request.getName());
+      throw new RuntimeException("食品が見つかりません: " + request.getName());
     }
 
-    return matched;
+    return ResponseEntity.ok(new ApiResponse<>(true, "計算成功", matched));
   }
 
 
   @PostMapping("/calculate-multi")
-  public List<FoodResponse> calculateMultipleFoods(@RequestBody @Valid List<@Valid FoodRequest> requests) {
+  public ResponseEntity<ApiResponse<List<FoodResponse>>> calculateMultipleFoods(@RequestBody @Valid List<@Valid FoodRequest> requests) {
     List<FoodItem> allFoods = foodItemRepository.findAll();
     List<FoodResponse> results = new ArrayList<>();
 
@@ -88,40 +90,42 @@ public class FoodController {
         }
       }
     }
-    return results;
+    return ResponseEntity.ok(new ApiResponse<>(true, "複数食品の計算成功", results));
   }
 
   @GetMapping("/history")
-  public List<FoodResponse> getHistory() {
-    return foodHistoryRepository.findAllByOrderByCreatedAtDesc()
+  public ResponseEntity<ApiResponse<List<FoodResponse>>> getHistory() {
+    List<FoodResponse> history = foodHistoryRepository.findAllByOrderByCreatedAtDesc()
         .stream()
-        .map(history -> new FoodResponse(
-            history.getName(),
-            history.getAmount(),
-            history.getEnergy(),
-            history.getProtein(),
-            history.getFat(),
-            history.getCarbohydrates(),
-            history.getSalt()
+        .map(h -> new FoodResponse(
+            h.getName(),
+            h.getAmount(),
+            h.getEnergy(),
+            h.getProtein(),
+            h.getFat(),
+            h.getCarbohydrates(),
+            h.getSalt()
         ))
         .collect(Collectors.toList());
+
+      return ResponseEntity.ok(new ApiResponse<>(true, "履歴取取得成功", history));
   }
 
   @PostMapping("/save-result")
-  public ResponseEntity<?> saveResult(@RequestBody @Valid List<FoodResponse> results) {
+  public ResponseEntity<ApiResponse<String>> saveResult(@RequestBody @Valid List<FoodResponse> results) {
     List<FoodHistory> toSave = results.stream().map(FoodResponse::toHistoryEntity).toList();
     foodHistoryRepository.saveAll(toSave);
-    return ResponseEntity.ok("保存成功");
+    return ResponseEntity.ok(new ApiResponse<>(true, "保存成功", "保存完了しました"));
   }
 
-  private String normalize(String input) {
-    return Normalizer.normalize(input, Normalizer.Form.NFKC)
-        .replaceAll("　", " ")
-        .trim();
-  }
+  // private String normalize(String input) {
+  //   return Normalizer.normalize(input, Normalizer.Form.NFKC)
+  //       .replaceAll("　", " ")
+  //       .trim();
+  // }
 
   @PostMapping("/pfc-ratio")
-  public PfcRatioResponse calculatePfcRatio(@RequestBody @Valid List<FoodResponse> foods) {
+  public ResponseEntity<ApiResponse<PfcRatioResponse>> calculatePfcRatio(@RequestBody @Valid List<FoodResponse> foods) {
     double totalProtein = 0;
     double totalFat = 0;
     double totalCarb = 0;
@@ -137,20 +141,30 @@ public class FoodController {
     double carbKcal = totalCarb * 4;
     double totalKcal = proteinKcal + fatKcal + carbKcal;
 
+    PfcRatioResponse result;
     if (totalKcal == 0) {
-      return new PfcRatioResponse(0,0,0);
+      result = new PfcRatioResponse(0, 0, 0);
+    } else {
+      result = new PfcRatioResponse(
+        proteinKcal / totalKcal * 100,
+        fatKcal / totalKcal * 100,
+        carbKcal / totalKcal * 100
+        );
     }
 
-    double pRatio = proteinKcal / totalKcal * 100;
-    double fRatio = fatKcal / totalKcal * 100;
-    double cRatio = carbKcal / totalKcal * 100;
-
-    return new PfcRatioResponse(pRatio,fRatio,cRatio);
+    return ResponseEntity.ok(new ApiResponse<>(true, "PFC比計算成功", result));
   }
 
   @GetMapping("/history/daily-summary")
-  public List<DailyTotalDTO> getDailySummary() {
-    return foodHistoryRepository.findDailyTotals();
+  public ResponseEntity<ApiResponse<List<DailyTotalDTO>>> getDailySummary() {
+    List<DailyTotalDTO> summary = foodHistoryRepository.findDailyTotals();
+    return ResponseEntity.ok(new ApiResponse<>(true, "日別計算成功", summary));
+  }
+
+  private String normalize(String input) {
+    return Normalizer.normalize(input, Normalizer.Form.NFKC)
+      .replaceAll(" ", " ")
+      .trim();
   }
 }
 
