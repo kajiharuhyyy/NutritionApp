@@ -178,8 +178,9 @@ function calculate(){
       body: JSON.stringify(data)
     })
     .then(res => res.json())
-    .then(pfc => {
-      updatePfcChart(pfc);
+    .then(res => {
+      if(!res.success) throw new Error(res.message);
+      updatePfcChart(res.data);
     })
     .catch(error => console.error("pfc計算エラー:", error));
 
@@ -204,23 +205,25 @@ function calculate(){
 
 window.onload = function () {
   fetch("/api/foods")
-  .then(response => response.json())
-  .then(data => {
+  .then(res => res.json())
+  .then(res => {
+    if(!res.success) throw new Error(res.message);
+    const data = res.data;
     const dataList = document.getElementById("foodList");
     dataList.innerHTML = "";
     data.forEach(item => {
-      const option = document.createElement("option");
+      const option = document.createElement("option");  
       option.value = item.name;
       dataList.appendChild(option);
     });
   })
-  .catch(error => {
-    console.error("食品一覧取得失敗:", error);
-  });
+  .catch(err => console.error("食品一覧取得失敗:", err));
 
   fetch("/api/foods/history")
   .then(response => response.json())
-  .then(history => {
+  .then(res => {
+    if(!res.success) throw new Error(res.message);
+    const history = res.data;
     const historyElement = document.getElementById("history");
     historyElement.innerHTML = "<h2>履歴</h2>";
     history.forEach(item => {
@@ -273,7 +276,10 @@ function updatePfcChart(pfc) {
 function fetchDailyPfcSummary() {
   fetch("/api/foods/history/daily-summary")
   .then(response => response.json())
-  .then(data => {
+  .then(res => {
+    if(!res.success) throw new Error(res.message);
+    const data = res.data;
+
     const labels = data.map(item => item.date);
     const proteinData = data.map(item => item.protein * 4);
     const fatData = data.map(item => item.fat * 9);
