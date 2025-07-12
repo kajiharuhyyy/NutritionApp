@@ -2,6 +2,9 @@ package org.example.nutritionapp.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+
+import java.time.LocalDate;
+
 import org.example.nutritionapp.model.FoodHistory;
 import org.example.nutritionapp.model.FoodItem;
 
@@ -16,6 +19,8 @@ public class FoodResponse {
   private double carbohydrates;
   private double salt;
 
+  private LocalDate createdAt;
+
   @SuppressWarnings("unused")
   public FoodResponse() {
   }
@@ -28,6 +33,7 @@ public class FoodResponse {
     entity.setFat(this.fat);
     entity.setCarbohydrates(this.carbohydrates);
     entity.setSalt(this.salt);
+    entity.setCreatedAt(this.createdAt);
     return entity;
   }
 

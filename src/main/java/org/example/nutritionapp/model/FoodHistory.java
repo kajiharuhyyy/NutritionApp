@@ -1,9 +1,12 @@
 package org.example.nutritionapp.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+
 import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,9 +29,17 @@ public class FoodHistory {
   private double carbohydrates;
   private double salt;
 
-  private LocalDateTime createdAt = LocalDateTime.now();
+  @Column(nullable = false, updatable = false)
+  private LocalDate createdAt;
 
-  private LocalDate date = LocalDate.now();
+  @PrePersist
+  public void onCreate() {
+    this.createdAt = LocalDate.now();
+  }
+
+  // private LocalDateTime createdAt = LocalDateTime.now();
+
+  // private LocalDate date = LocalDate.now();
 
   // デフォルトコンストラクタ（JPA用）
   public FoodHistory() {}
@@ -42,7 +53,5 @@ public class FoodHistory {
     this.fat = fat;
     this.carbohydrates = carbohydrates;
     this.salt = salt;
-    this.createdAt = LocalDateTime.now();
-    this.date = LocalDate.now();
   }
 }

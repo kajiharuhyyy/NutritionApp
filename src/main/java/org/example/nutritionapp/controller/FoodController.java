@@ -4,6 +4,7 @@ import java.text.Normalizer;
 import org.example.nutritionapp.dto.PfcRatioResponse;
 import org.example.nutritionapp.exception.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,31 +41,29 @@ public class FoodController {
 
   @PostMapping("/calculate")
   public ResponseEntity<ApiResponse<List<FoodResponse>>> calculateFoods(@RequestBody @Valid FoodRequest request) {
-    List<FoodItem> allFoods = foodItemRepository.findAll(); // CSVではなくDBから取得
-
+    List<FoodItem> allFoods = foodItemRepository.findAll();
     String normalizedRequestName = normalize(request.getName());
 
-    List <FoodResponse> matched = allFoods.stream()
+    List<FoodResponse> matched = allFoods.stream()
         .filter(item -> normalize(item.getName()).contains(normalizedRequestName))
         .map(item -> {
           double factor = request.getAmount() / 100.0;
-          return new  FoodResponse(
+          return new FoodResponse(
               item.getName(),
               request.getAmount(),
               item.getEnergy() * factor,
               item.getProtein() * factor,
               item.getFat() * factor,
               item.getCarbohydrates() * factor,
-              item.getSalt() * factor
+              item.getSalt() * factor,
+              null
           );
         }).collect(Collectors.toList());
     if (matched.isEmpty()) {
       throw new RuntimeException("食品が見つかりません: " + request.getName());
     }
-
     return ResponseEntity.ok(new ApiResponse<>(true, "計算成功", matched));
   }
-
 
   @PostMapping("/calculate-multi")
   public ResponseEntity<ApiResponse<List<FoodResponse>>> calculateMultipleFoods(@RequestBody @Valid List<@Valid FoodRequest> requests) {
@@ -73,7 +72,6 @@ public class FoodController {
 
     for (FoodRequest request : requests) {
       String normalizedRequestName = normalize(request.getName());
-
       for (FoodItem item : allFoods) {
         if (normalize(item.getName()).equalsIgnoreCase(normalizedRequestName)) {
           double factor = request.getAmount() / 100.0;
@@ -84,7 +82,8 @@ public class FoodController {
               item.getProtein() * factor,
               item.getFat() * factor,
               item.getCarbohydrates() * factor,
-              item.getSalt() * factor
+              item.getSalt() * factor,
+              null
           ));
           break;
         }
@@ -95,7 +94,7 @@ public class FoodController {
 
   @GetMapping("/history")
   public ResponseEntity<ApiResponse<List<FoodResponse>>> getHistory() {
-    List<FoodResponse> history = foodHistoryRepository.findAllByOrderByCreatedAtDesc()
+    List<FoodResponse> history = foodHistoryRepository.findAll(Sort.by(Sort.Direction.DESC, "createdAt"))
         .stream()
         .map(h -> new FoodResponse(
             h.getName(),
@@ -104,11 +103,12 @@ public class FoodController {
             h.getProtein(),
             h.getFat(),
             h.getCarbohydrates(),
-            h.getSalt()
+            h.getSalt(),
+            h.getCreatedAt()
         ))
         .collect(Collectors.toList());
 
-      return ResponseEntity.ok(new ApiResponse<>(true, "履歴取取得成功", history));
+    return ResponseEntity.ok(new ApiResponse<>(true, "履歴取得成功", history));
   }
 
   @PostMapping("/save-result")
@@ -117,12 +117,6 @@ public class FoodController {
     foodHistoryRepository.saveAll(toSave);
     return ResponseEntity.ok(new ApiResponse<>(true, "保存成功", "保存完了しました"));
   }
-
-  // private String normalize(String input) {
-  //   return Normalizer.normalize(input, Normalizer.Form.NFKC)
-  //       .replaceAll("　", " ")
-  //       .trim();
-  // }
 
   @PostMapping("/pfc-ratio")
   public ResponseEntity<ApiResponse<PfcRatioResponse>> calculatePfcRatio(@RequestBody @Valid List<FoodResponse> foods) {
@@ -141,16 +135,13 @@ public class FoodController {
     double carbKcal = totalCarb * 4;
     double totalKcal = proteinKcal + fatKcal + carbKcal;
 
-    PfcRatioResponse result;
-    if (totalKcal == 0) {
-      result = new PfcRatioResponse(0, 0, 0);
-    } else {
-      result = new PfcRatioResponse(
-        proteinKcal / totalKcal * 100,
-        fatKcal / totalKcal * 100,
-        carbKcal / totalKcal * 100
+    PfcRatioResponse result = (totalKcal == 0) ?
+        new PfcRatioResponse(0, 0, 0) :
+        new PfcRatioResponse(
+          proteinKcal / totalKcal * 100,
+          fatKcal / totalKcal * 100,
+          carbKcal / totalKcal * 100
         );
-    }
 
     return ResponseEntity.ok(new ApiResponse<>(true, "PFC比計算成功", result));
   }
@@ -163,8 +154,7 @@ public class FoodController {
 
   private String normalize(String input) {
     return Normalizer.normalize(input, Normalizer.Form.NFKC)
-      .replaceAll(" ", " ")
+      .replaceAll("\\s+", " ")
       .trim();
   }
 }
-
