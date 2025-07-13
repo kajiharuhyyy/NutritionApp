@@ -8,15 +8,15 @@ public class DailyTotalDTO {
   private double totalEnergy;
   private double totalProtein;
   private double totalFat;
-  private double totaCarbohydrates;
+  private double totalCarbohydrates;
   private double totalSalt;
 
-  public DailyTotalDTO(LocalDate date, double totalEnergy, double totalProtein, double totalFat, double totaCarbohydrates, double totalSalt) {
-    this.date = date;
-    this.totalEnergy = totalEnergy;
-    this.totalProtein = totalProtein;
-    this.totalFat = totalFat;
-    this.totaCarbohydrates = totaCarbohydrates;
-    this.totalSalt = totalSalt;
+  public DailyTotalDTO(LocalDate createdAt, double energy, double protein, double fat, double carbohydrates, double salt) {
+    this.date = createdAt;
+    this.totalEnergy = energy;
+    this.totalProtein = protein;
+    this.totalFat = fat;
+    this.totalCarbohydrates = carbohydrates;
+    this.totalSalt = salt;
   }
 }

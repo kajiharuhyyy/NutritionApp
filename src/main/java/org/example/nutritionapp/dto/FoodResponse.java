@@ -33,7 +33,7 @@ public class FoodResponse {
     entity.setFat(this.fat);
     entity.setCarbohydrates(this.carbohydrates);
     entity.setSalt(this.salt);
-    entity.setCreatedAt(this.createdAt);
+    entity.setCreatedAt(LocalDate.now());
     return entity;
   }
 
