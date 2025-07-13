@@ -160,10 +160,11 @@ public class FoodController {
 
   @GetMapping("/export-csv")
   public ResponseEntity<byte[]> exportCsv() {
-    List<FoodHistory> histiryList = foodHistoryRepository.findAll(Sort.by(Sort.Direction.DESC, "createAt"));
+    List<FoodHistory> histiryList = foodHistoryRepository.findAll(Sort.by(Sort.Direction.DESC, "createdAt"));
 
     StringBuilder csvBuilder = new StringBuilder();
-    csvBuilder.append("Name,Amount,Energy,Protein,Fat,Carbohydrates,Salt,CreateAt\n");
+    csvBuilder.append("Name,Amount,Energy,Protein,Fat,Carbohydrates,Salt,CreatedAt\n");
+
     for (FoodHistory h : histiryList) {
       csvBuilder.append(String.format("%s,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%s\n",
       h.getName(),
@@ -173,7 +174,8 @@ public class FoodController {
       h.getFat(),
       h.getCarbohydrates(),
       h.getSalt(),
-      h.getCreatedAt()));
+      h.getCreatedAt()!=null ? h.getCreatedAt().toString() : ""
+      ));
     }
 
     byte[] csvBytes = csvBuilder.toString().getBytes();
