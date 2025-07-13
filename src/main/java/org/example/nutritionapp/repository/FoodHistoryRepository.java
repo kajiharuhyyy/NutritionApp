@@ -14,6 +14,6 @@ public interface FoodHistoryRepository extends JpaRepository<FoodHistory, Long> 
     List<FoodHistory> findAllByOrderByCreatedAtDesc();
 
     @Query("SELECT NEW org.example.nutritionapp.dto.DailyTotalDTO(f.date, SUM(f.energy), SUM(f.protein), SUM(f.fat), SUM(f.carbohydrates), SUM(f.salt)) " +
-       "FROM FoodHistory f GROUP BY f.date ORDER BY f.date")
+       "FROM FoodHistory f GROUP BY f.date ORDER BY f.createdAt")
     List<DailyTotalDTO> findDailyTotals();
   }
