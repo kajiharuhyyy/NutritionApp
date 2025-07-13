@@ -157,4 +157,30 @@ public class FoodController {
       .replaceAll("\\s+", " ")
       .trim();
   }
+
+  @GetMapping("/export-csv")
+  public ResponseEntity<byte[]> exportCsv() {
+    List<FoodHistory> histiryList = foodHistoryRepository.findAll(Sort.by(Sort.Direction.DESC, "createAt"));
+
+    StringBuilder csvBuilder = new StringBuilder();
+    csvBuilder.append("Name,Amount,Energy,Protein,Fat,Carbohydrates,Salt,CreateAt\n");
+    for (FoodHistory h : histiryList) {
+      csvBuilder.append(String.format("%s,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%s\n",
+      h.getName(),
+      h.getAmount(),
+      h.getEnergy(),
+      h.getProtein(),
+      h.getFat(),
+      h.getCarbohydrates(),
+      h.getSalt(),
+      h.getCreatedAt()));
+    }
+
+    byte[] csvBytes = csvBuilder.toString().getBytes();
+
+    return ResponseEntity.ok()
+    .header("Content=Disposision", "attachment; filename=food_history.csv")
+    .header("Content-Type", "text/csv")
+    .body(csvBytes);
+  }
 }
