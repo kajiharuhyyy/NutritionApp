@@ -1,6 +1,10 @@
 package org.example.nutritionapp.controller;
 
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.text.Normalizer;
+
+import jakarta.servlet.http.HttpServletResponse;
 import org.example.nutritionapp.dto.PfcRatioResponse;
 import org.example.nutritionapp.exception.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -184,5 +188,32 @@ public class FoodController {
     .header("Content=Disposision", "attachment; filename=food_history.csv")
     .header("Content-Type", "text/csv")
     .body(csvBytes);
+  }
+
+  @GetMapping("/export-csv")
+  public void exportCsv(HttpServletResponse response) throws IOException {
+    List<FoodHistory> historyList = foodHistoryRepository.findAll(Sort.by(Sort.Direction.DESC,"createdAt"));
+
+    response.setContentType("text/csv");
+    response.setHeader("Content-Disposition","attachment; filename=nutrition_history.csv");
+
+    PrintWriter writer = response.getWriter();
+    writer.println("name,amount,energy,protein,fat,carbohydrates,salt,createdAt");
+
+    for (FoodHistory item: historyList) {
+      writer.printf("%s,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%s%n",
+              item.getName(),
+              item.getAmount(),
+              item.getEnergy(),
+              item.getProtein(),
+              item.getFat(),
+              item.getCarbohydrates(),
+              item.getSalt(),
+              item.getCreatedAt()
+              );
+    }
+
+    writer.flush();
+    writer.close();
   }
 }
