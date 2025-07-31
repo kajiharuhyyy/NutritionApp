@@ -189,31 +189,4 @@ public class FoodController {
     .header("Content-Type", "text/csv")
     .body(csvBytes);
   }
-
-  @GetMapping("/export-csv")
-  public void exportCsv(HttpServletResponse response) throws IOException {
-    List<FoodHistory> historyList = foodHistoryRepository.findAll(Sort.by(Sort.Direction.DESC,"createdAt"));
-
-    response.setContentType("text/csv");
-    response.setHeader("Content-Disposition","attachment; filename=nutrition_history.csv");
-
-    PrintWriter writer = response.getWriter();
-    writer.println("name,amount,energy,protein,fat,carbohydrates,salt,createdAt");
-
-    for (FoodHistory item: historyList) {
-      writer.printf("%s,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%s%n",
-              item.getName(),
-              item.getAmount(),
-              item.getEnergy(),
-              item.getProtein(),
-              item.getFat(),
-              item.getCarbohydrates(),
-              item.getSalt(),
-              item.getCreatedAt()
-              );
-    }
-
-    writer.flush();
-    writer.close();
-  }
 }
